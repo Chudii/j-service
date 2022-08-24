@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
 
 #root {
-  margin-top: 4vh;
+  margin-top: 3vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -63,7 +63,7 @@ h1, h2, h3, h4 {
 }
 
 .welcome {
-  margin-top: 2vh;
+  margin-top: 1vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -155,4 +155,8 @@ button:focus {
 
 form {
   margin: 3vh 0;
+}
+
+.answer {
+  display: none;
 }

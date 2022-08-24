@@ -1,70 +1,38 @@
-import logo from './logo.svg';
 import './App.css';
 import { useEffect, useState } from 'react';
 
 function App() {
-  const [state, setState] = useState({})
+  const [state, setState] = useState({ category: { title: ''} })
   const [score, setScore] = useState(0)
-  
+  const [isLoading, setIsLoading] = useState(true)
+  const answer = document.querySelector('.answer')
+  const incButton = document.querySelector('#incButton')
+  const decButton = document.querySelector('#decButton')
+
+  useEffect(() => {
+    setIsLoading(false)
+  }, [])
+
   const getQuestion = (evt) => {
-      fetch("http://jservice.io/api/random")
+    evt.preventDefault()
+    fetch("http://jservice.io/api/random")
       .then(res => res.json())
-      .then(json => {
-        setState(json[0])
-        updateQuestion(json[0])
-      })
+      .then(json => setState(json[0]))
       .catch(err => console.log(err))
+    console.log(state.question)
+    answer.style.display = 'none'
   }
 
-  const updateQuestion = (data) => {
-    if (data) {
-      const question = document.querySelector('.question')
-      const category = document.querySelector('.category')
-      const points = document.querySelector('.points')
-      const answer = document.querySelector('.answer')
-      const incButton = document.querySelector('#incButton')
-      const decButton = document.querySelector('#decButton')
-      const scoreTrack = document.querySelector('.score')
-
-      incButton.disabled = false
-      decButton.disabled = false
-      category.innerHTML = data.category.title
-      points.innerHTML = data.value || 0
-      question.innerHTML = data.question
-      answer.style.display = 'none'
-      answer.innerHTML = data.answer
-      scoreTrack.innerHTML = score
-    }
-  }
-
-  const getAnswer = (evt) => {
-    const answer = document.querySelector('.answer')
+  const getAnswer = () => {
     answer.style.display = 'block'
   }
 
-  const incScore = (evt, currentScore) => {
-    evt.preventDefault()
-
-    setScore(currentScore + state.value)
-    const incButton = document.querySelector('#incButton')
-    const decButton = document.querySelector('#decButton')
-    const scoreTrack = document.querySelector('.score')
-    scoreTrack.innerHTML = `${currentScore} (+${state.value})`
-    incButton.disabled = true
-    decButton.disabled = true
+  const incScore = () => {
+    setScore(score + state.value)
   }
 
-  const decScore = (evt, currentScore) => {
-    evt.preventDefault()
-    setScore(currentScore - state.value)
-    const incButton = document.querySelector('#incButton')
-    const decButton = document.querySelector('#decButton')
-    const scoreTrack = document.querySelector('.score')
-    scoreTrack.innerHTML = `${currentScore} (-${state.value})`
-    incButton.disabled = true
-    decButton.disabled = true
-    
-    
+  const decScore = () => {
+    setScore(score - state.value)
   }
 
   return (
@@ -72,41 +40,62 @@ function App() {
       <div className='welcome'>
         <h1>* jService JEOPARDY *</h1>
       </div>
-
-      <div className='card'>
-        <div className='score-card'>
-          <div className='score-section'>
-            <h2>Score: </h2>
-            <p className='score'>-</p>
-          </div>
-          
-          <div className='buttons'>
-            <button id='incButton' onClick={evt => incScore(evt, score)}>Increase</button>
-            <button id='decButton' onClick={evt => decScore(evt, score)}>Decrease</button>
-            <button id='resetButton' onClick={() => document.location.reload(true)}>Reset</button>
-          </div>
+      
+      <div className='score-card'>
+        <div className='score-section'>
+          <h2>Score: </h2>
+          <p className='score'>{score}</p>
         </div>
+      </div>
 
-        <div className='question-card'>
-          <h2>Lets play!</h2>
-          <button id='questionButton' onClick={evt => getQuestion(evt)}>Get Question</button>
+      <div className='buttons'>
+        <button id='incButton' onClick={incScore}>Increase</button>
+        <button id='decButton' onClick={decScore}>Decrease</button>
+        <button id='resetButton' onClick={() => document.location.reload(true)}>Reset</button>
+      </div>
+
+      <div className='question-card'>
+        <h2>Let's play!</h2>
+        <button id='questionButton' onClick={(evt) => getQuestion(evt)}>Get Question</button>
+      </div>
+      
+      {!isLoading ?
+        <>
+          <div className='question-category'>
+            <h3>Category: </h3>
+            <p className='category'>{state.category.title}</p>
+          </div>
+      
+          <div className='question-points'>
+            <h4>Points: </h4>
+            <p className='points'>{state.value}</p>
+          </div>
+
+          <div className='question-description'>
+            <h3>description: </h3>
+            <p className='question'>{state.question}</p>
+          </div>
+        </>
+        : <>
           <div className='question-category'>
             <h3>Category: </h3>
             <p className='category'>-</p>
           </div>
+      
           <div className='question-points'>
             <h4>Points: </h4>
             <p className='points'>-</p>
           </div>
+
           <div className='question-description'>
-            <h2>Description: </h2>
+            <h3>Description: </h3>
             <p className='question'>-</p>
           </div>
-        </div>
-      </div>
+        </>
+      }
       <button id='answerButton' onClick={evt => getAnswer(evt)}>Click to Reveal Answer </button>
       <div className='question-answer'>
-        <h3 className='answer'></h3>
+        <h3 className='answer'>{state.answer}</h3>
       </div>
     </div>
   );
